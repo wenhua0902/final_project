@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>次元街角 DimCorner</title>
+  <style>
+    :root {
+      --primary: #ff85a1;
+      --accent: #ffd3e0;
+      --background: #fff5f8;
+      --text: #333;
+      --highlight: #ff4f72;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans TC', 'Segoe UI', sans-serif;
+      margin: 0; padding: 0;
+      background-color: var(--background);
+      color: var(--text);
+    }
+    .community-section h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    input[type="text"],
+    textarea {
+      padding: 0.8rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    header {
+      padding: 2rem 1rem 1rem;
+      text-align: center;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      color: black;
+    }
+    h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1rem 0 2rem;
+    }
+    nav button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 20px;
+      background-color: white;
+      color: var(--primary);
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    nav button:hover, nav button.active {
+      background-color: var(--highlight);
+      color: white;
+    }
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 0 1rem 3rem;
+    }
+    section { display: none; }
+    section.active { display: block; }
+    h2 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .card, .category, .post {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s;
+    }
+    .card:hover, .category:hover, .post:hover {
+      transform: translateY(-4px);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 700px; 
+      margin: auto;
+      position: relative;
+    }
+    .modal .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .comment-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .comment-input input {
+      flex: 1;
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      border: 1px solid var(--accent);
+    }
+    .comment-input button {
+      background-color: var(--primary);
+      border: none;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .like-btn {
+      cursor: pointer;
+      margin-top: 0.5rem;
+      color: var(--highlight);
+      font-weight: bold;
+    }
+    .like-btn.liked {
+      color: gray;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #999;
+      margin-top: 3rem;
+    }
+    .city-switcher {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .city-switcher button {
+      margin: 0 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--primary);
+      background: white;
+      color: var(--primary);
+      cursor: pointer;
+    } */
+    .city-switcher button.active {
+      background: var(--primary); 
+      color: white;
+    }
+    .city-btn {
+    font-size: 1rem;       /* 字體放大 */
+    padding: 0.8rem 1.5rem;  /* 按鈕內距放大 */
+    margin-right: 0.5rem;    /* 按鈕間距 */
+    height: 40px;            /* 高度固定 */
+    border-radius: 8px;      /* 圓角 */
+    border: 2px solid #555;  /* 邊框 */
+    background-color: #eee;  /* 背景色 */
+    text-align: center;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .city-btn:hover {
+    background-color: #ddd;  /* 滑鼠移入變色 */
+  }
+
+  .tags span {
+    background-color: #e0e7ff;
+    color: palevioletred;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid palevioletred;
+    display: inline-block;
+  }
+  .tag-label {
+    background-color: #e0e7ff;
+    color: palevioletred;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid palevioletred;
+    display: inline-block;
+  }
+
+  .event-title p {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin: 10px 0;
+  }
+
+  .datetime-location p,
+  .notice p,
+  .recruitment p {
+    margin: 6px 0;
+    line-height: 1.4;
+  }
+
+  .notice ul {
+    margin-left: 20px;
+    list-style-type: disc;
+    color: #444;
+  }
+
+  .card-section {
+    margin-bottom: 12px;
+  }
+
+  .card h3 {
+    font-size: 1.4rem; /* 或你可以試 2rem 更大 */
+    font-weight: bold;
+  }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><b>次元街角</b></h1>
+    <p class="subtitle"><b>在夢與現實之間，遇見同樣熱愛的你。</b></p>
+    <nav>
+      <button class="active" data-target="home">首頁</button>
+      <button data-target="events">活動資訊</button>
+      <button data-target="commissions">專業委託</button>
+      <button data-target="community">交流區</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 首頁 -->
+    <section id="home" class="active">
+      <h2>歡迎來到次元街角</h2>
+      <p style="text-align: left; max-width: 800px; margin: auto;">
+        《次元街角》是一個專為動漫愛好者打造的交流平台，致力於聚集多元次文化族群，無論你是 Coser、攝影師、夢女、繪師、同人創作者，還是純粹熱愛作品的粉絲，都能在此找到共鳴與夥伴。
+        平台設有多個互動專區，提供創作分享、心得交流、委託合作及最新活動資訊整理等功能。網站特設活動專欄，整合全台年度動漫展演與同人活動資訊，方便用戶查找與規劃參與行程。
+        <br>
+        《次元街角》不僅是一個資訊平台，更是一個讓「熱愛成為連結」的社群基地，讓每一位身處二次元世界的愛好者，在虛擬空間中找到歸屬與舞台。
+      </p>
+      <br>
+      <div class="grid-container">
+        <div class="card">
+          <h3>推薦貼文</h3>
+          <p>精選創作與心得分享文章。</p>
+          <hr>
+
+          <div class="card-section tags">
+            <span class="tag-recruit">#徵替補</span>
+            <span class="tag-recruit">#徵缺角</span>
+            <span class="tag-photographer">#徵攝影</span>
+            <span class="tag-assistant">#徵馬內</span>
+          </div>
+
+          <div class="card-section event-title">
+            <p>ハイキュー!! 🐦‍⬛🐈‍⬛🦉 東京三校集訓 團拍</p>
+          </div>
+          <div class="card-section datetime-location">
+            <p><strong>日期｜</strong>2025.07.05</p>
+            <p><strong>時間｜</strong>13:00~17:00</p>
+            <p><strong>地點｜</strong>新北某大學體育館室內排球場</p>
+          </div>
+          <div class="card-section notice">
+            <p><strong>注意事項｜</strong></p>
+            <ul>
+              <li>一共拍攝兩套（球衣 ＆ 練習服（T恤×號碼衣））</li>
+              <li>為求畫面統一、部分服裝需一起購入</li>
+              <li>需平擔 場地費／攝影委託費／排版費</li>
+            </ul>
+          </div>
+          <br>
+          <div class="card-section recruitment">
+            <p><strong class="tag-label">#徵替補  #徵缺角</strong></p>
+            <p>優先徵求 列夫 替補！！</p>
+            <p>其他名單上沒有出現的角色有興趣的朋朋也歡迎報名！</p>
+          </div>
+          <div class="card-section recruitment">
+            <p><strong class="tag-label">#徵攝影</strong></p>
+            <p>收費、互惠皆可！請提供報價及作品參考！目前還需要兩位～</p>
+          </div>
+          <div class="card-section recruitment">
+            <p><strong class="tag-label">#徵馬內</strong></p>
+            <p>希望能麻煩馬內協助團拍流程順利進行（現場掌控拍攝時間與指定拍攝內容），
+            若能夠用手機偶爾側拍側錄一點有的沒的為佳！</p>
+          </div>
+           <img src="image/LINE_ALBUM_網頁用圖片_250602_1.jpg"  width="300" height="500" />
+        </div>
+
+        <div class="card">
+          <h3>人氣創作</h3>
+          <p>最多人瀏覽與點讚的熱門內容。</p>
+          <hr>
+          <div class="card-section">
+            <h4>ここは梦が始まったところだ</h4>
+            <p>📷ハイキュー‼︎聖地巡礼🏐<br>
+              ²⁰²⁵·<br>
+              -<br>
+              已獲得仙台市體育館Cos及攝影許可<br>
+              Photo thx Hao Mi
+            </p>
+          </div>
+          <img src="image/LINE_ALBUM_網頁用圖片_250602_3.jpg"  width="300" height="500">
+        </div>
+
+        <div class="card">
+          <h3>最新委託推薦</h3>
+          <p>精選優質委託者與新進創作者推薦！</p>
+          <hr>
+          <div class="card-section">
+            <h3>#繪師</h3>
+            <p><strong>暱稱：</strong>宅星</p>
+            <p><strong>介紹：</strong>創作風格多變，從日系清新到歐美暗黑皆能掌握，擅長角色肢體動作的描繪與細緻的表情變化。</p>
+            <p><strong>作品集：</strong><a href="https://www.facebook.com/share/p/16VzufxPjs/" target="_blank">https://www.facebook.com/share/p/16VzufxPjs/</a></p>
+            <p><strong>價目：</strong>私訊報價</p>
+            <p><strong>聯絡方式：</strong>FB｜Zhai Xing</p>
+        </div>
+        <img src="image/LINE_ALBUM_網頁用圖片_250602_2.jpg"  style="width: 75%; border-radius: 8px; margin-bottom: 2px;">
+      </div>
+ 
+    </section>
+
+    <!-- 活動資訊 -->
+    <section id="events">
+    <h2>活動資訊欄</h2>
+
+    <!-- 地區選單 -->
+    <select id="regionSelector" onchange="handleRegionChange()" 
+      style="
+        margin-bottom: 2rem;
+        font-size: 1rem; /* 字體放大 */
+        padding: 0.5rem 1rem;     /* 放大上下左右內距 */
+        height: 40px;             /* 明確設定高度 */
+        width: 450px;             /* 可依需求調整寬度，或使用 100% 佔滿 */
+        border-radius: 8px;      /* 圓角 */
+        border: 2px solid #888;   /* 邊框粗一點，看起來更明顯 */
+      ">
+      <option value="">請選擇地區</option>
+      <option value="north">北部地區</option>
+      <option value="central">中部地區</option>
+      <option value="south">南部地區</option>
+    </select>
+
+    <!-- 城市選單區 -->
+    <div id="cityButtons" style="margin-bottom: 1rem; display: flex; gap: 1rem; justify-content: left; flex-wrap: wrap;"></div>
+
+    <!-- 活動內容 -->
+     <!-- 北部地區 -->
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> 2025 台北國際動漫節 FUN玩創意</h3>
+        <p><strong>時間：</strong>2025年2月6日(四) ~ 2月10日(一)</p>
+        <p><strong>地點：</strong>南港展覽館一館(台北市南港區經貿二路1號)</p>
+        <p><a href="https://www.ccpa.org.tw/tica/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> Bushiroad EXPO 2025 in Taipei</h3>
+        <p><strong>時間：</strong>2025年2月6日(四) ~ 2月10日(一)</p>
+        <p><strong>地點：</strong>南港展覽館一館(台北市南港區經貿二路1號)</p>
+        <p><a href="https://bushiroad.com/2025bushiroadexpo_taipei_cn">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> Bring It On！歐美主題ONLY場 12</h3>
+        <p><strong>時間：</strong>2025年5月10日(六)</p>
+        <p><strong>地點：</strong>花博公園爭艷館(台北市中山區玉門街1號)</p>
+        <p><a href="https://bio.gjs.tw/circle.html">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> IF 創集繪 同人誌販售會</h3>
+        <p><strong>時間：</strong>2025年5月10日(六)</p>
+        <p><strong>地點：</strong>花博公園爭艷館(台北市中山區玉門街1號)</p>
+        <p><a href="https://bio.gjs.tw/circle.html">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> 第24屆 漫畫博覽會(台北)</h3>
+        <p><strong>時間：</strong>2025年7月24日(四) ~ 7月28日(一)</p>
+        <p><strong>地點：</strong>台北世界貿易中心展覽一館(台北市信義路五段5號)</p>
+        <p><a href="http://www.ccpa.org.tw/comic/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> CWT-70 台灣同人誌販售會(台北場)</h3>
+        <p><strong>時間：</strong>2025年8月16日(六) ~ 8月17日(日)</p>
+        <p><strong>地點：</strong>國立台灣大學綜合體育館B1、1F、3F、4F(台北市大安區羅斯福路四段1號)</p>
+        <p><a href="https://www.comicworld.com.tw/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> Fancy Frontier 開拓動漫祭45(FF45)</h3>
+        <p><strong>時間：</strong>2025年8月22日(五) ~ 8月24日(日)</p>
+        <p><strong>地點：</strong>花博公園爭艷館(台北市中山區玉門街1號)</p>
+        <p><a href="https://www.f-2.com.tw/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> Petit Fancy 亞洲動漫創作展43(PF43)</h3>
+        <p><strong>時間：</strong>2025年11月1日(六) ~ 11月2日(日)</p>
+        <p><strong>地點：</strong>花博公園爭艷館(台北市中山區玉門街1號)</p>
+        <p><a href="https://www.f-2.com.tw/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taipei" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> Reality Fantasy 開拓模型祭13(RF13)</h3>
+        <p><strong>時間：</strong>2025年11月1日(六) ~ 11月2日(日)</p>
+        <p><strong>地點：</strong>花博公園爭艷館(台北市中山區玉門街1號)</p>
+        <p><a href="https://www.f-2.com.tw/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="hsinchu" class="event-city active" style="display:none;">
+      <div class="card">
+        <h3> 漫人祭(新竹場)</h3>
+        <p><strong>時間：</strong>2025年7月(具體日期待定)</p>
+        <p><strong>地點：</strong>新竹市立體育館(新竹市北區中華路三段1號)</p>
+        <p><a href="https://www.facebook.com/groups/302576229919917/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <!-- 中部地區 -->
+    <div id="taichung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>台中國際動漫節</h3>
+        <p><strong>時間：</strong>2025年4月3日(四) ~ 4月6日(日)</p>
+        <p><strong>地點：</strong>台中國際展覽館(台中市烏日區中山路三段1號)</p>
+        <p><a href="https://www.ccpa.org.tw/tcca/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taichung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>TVexpo - 台灣 Vtuber 博覽會</h3>
+        <p><strong>時間：</strong>2025年4月12日(六) ~ 4月13日(日)</p>
+        <p><strong>地點：</strong>台中國際展覽館(台中市烏日區中山路三段1號)</p>
+        <p><a href="https://www.instagram.com/reel/DHnzi0bTFZi/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taichung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>奇幻森林遊樂園 同人展</h3>
+        <p><strong>時間：</strong>2025年4月12日(六)</p>
+        <p><strong>地點：</strong>龍山文創基地(台中市南區復興路三段362號)</p>
+        <p><a href="https://www.instagram.com/reel/DHnzi0bTFZi/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taichung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>CWT-70 台灣同人誌販售會(台中場)</h3>
+        <p><strong>時間：</strong>2025年9月(具體日期待定)</p>
+        <p><strong>地點：</strong>台中國際展覽館(台中市烏日區中山路三段1號)</p>
+        <p><a href="https://www.comicworld.com.tw/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taichung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>Petit Fancy 亞洲動漫創作展(台中場)</h3>
+        <p><strong>時間：</strong>2025年10月(具體日期待定)</p>
+        <p><strong>地點：</strong>台中國際展覽館(台中市烏日區中山路三段1號)</p>
+        <p><a href="https://www.f-2.com.tw/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="taichung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>Reality Fantasy 開拓模型祭(台中場)</h3>
+        <p><strong>時間：</strong>2025年10月(具體日期待定)</p>
+        <p><strong>地點：</strong>台中國際展覽館(台中市烏日區中山路三段1號)</p>
+        <p><a href="https://www.f-2.com.tw/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <!-- 南部地區 -->
+    <div id="kaohsiung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>Phantasy Square 奇幻動漫祭(高雄場)</h3>
+        <p><strong>時間：</strong>2025年11月8日(六) ~ 11月9日(日)
+        <br><p style="color: brown;"><strong>【第一天 10:30~17:30(17:20 停止售票及入場)】</strong></p>
+        <p><strong>地點：</strong>高雄市小港區社教館體育館(高雄市小港區學府路115號)</p>
+        <p><a href="https://phantasysquare.wixstudio.com/mysite">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="kaohsiung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>高雄國際動漫節(KICA)</h3>
+        <p><strong>時間：</strong>2025年10月10日(五) ~ 10月13日(一)</p>
+        <p><strong>地點：</strong>高雄巨蛋(高雄市左營區博愛二路757號)</p>
+        <p><a href="https://www.ccpa.org.tw/kica/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="pingtung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>FUN玩樂高風 樂高特展(屏東)</h3>
+        <p><strong>時間：</strong>2024年12月14日(六) ~ 2025年4月6日(日)
+        <br><p style="color: brown;"><strong>【09:00–18:00（17:00 停止售票及入場），週一休館】</strong></p>
+        <p><strong>地點：</strong>屏東1936文化基地10號倉庫(屏東市菸廠路1號)</p>
+        <p><a href="https://dailyview.tw/popular/detail/28754">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="tainan" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>動漫遊台灣 2025 國際學術研討會(台南)</h3>
+        <p><strong>時間：</strong>2025年5月10日(六) ~ 5月11日(日)</p>
+        <p><strong>地點：</strong>國立臺灣文學館(台南市中西區湯德章大道1號)</p>
+        <p><a href="https://www.facebook.com/100082956291443/posts/%E7%A0%94%E8%A8%8E%E6%9C%83%E5%A0%B4%E6%AC%A1%E7%B8%BD%E8%A1%A8%E5%8B%95%E6%BC%AB%E9%81%8A%E5%8F%B0%E7%81%A3-2025%E5%9C%8B%E9%9A%9B%E5%AD%B8%E8%A1%93%E7%A0%94%E8%A8%8E%E6%9C%83%E4%B9%85%E7%AD%89%E4%BA%86%E5%A4%A7%E5%AE%B6%E7%86%B1%E9%A8%B0%E9%A8%B0%E7%9A%84%E7%A0%94%E8%A8%8E%E6%9C%83%E5%A0%B4%E6%AC%A1%E7%B8%BD%E8%A1%A8%E5%87%BA%E7%88%90%E4%BA%86%E5%A0%B4%E6%AC%A1%E7%B8%BD%E8%A1%A8%E9%80%A3%E6%8E%A5httpsdocsgooglecomspreadsheetsd/692368490205021/">活動官網連結</a></p>
+      </div>
+    </div>
+
+    <div id="pingtung" class="event-city" style="display:none;">
+      <div class="card">
+        <h3>屏東海洋嘉年華 2025 海口祭(屏東)</h3>
+        <p><strong>時間：</strong>2025年7月5日(六) ~ 7月6日(日)、2025年7月12日(六) ~ 7月13日(日)
+        <br><p style="color: brown;"><strong>【15:00~21:00(13:00開始報到)】</strong></p>
+        <p><strong>地點：</strong>屏東縣車城鄉海口路1-12號</p>
+        <p><a href="https://www.facebook.com/100063830121494/posts/%E5%B1%8F%E6%9D%B1%E6%B5%B7%E6%B4%8B%E5%98%89%E5%B9%B4%E8%8F%AF2025%E6%B5%B7%E5%8F%A3%E7%A5%ADhalkou-fesilval%E6%B4%BB%E5%8B%95%E6%97%A5%E6%9C%9F2025%E5%B9%B40705-0706%E5%85%AD%E6%97%A50712-0713%E5%85%AD%E6%97%A5%E6%B4%BB%E5%8B%95%E6%99%82%E9%96%931500-2100httpsww/1180409140763412/">活動官網連結</a></p>
+      </div>
+    </div>
+  </section>
+
+    <!-- 專業委託 -->
+    <section id="commissions">
+    <h2>專業委託區</h2>
+    <div class="city-switcher">
+        <button onclick="switchCategory('photographer')" class="active">攝影師</button>
+        <button onclick="switchCategory('coser')">COSER</button>
+        <button onclick="switchCategory('wig')">假髮造型師</button>
+        <button onclick="switchCategory('makeup')">化妝師</button>
+        <button onclick="switchCategory('dream')">夢女委託</button>
+    </div>
+
+    <!--攝影師-->
+    <div id="photographer" class="category-section active" style="display: block">
+      <div class="card horizontal-card" style="display: flex; align-items: center; gap: 10px;">
+        <div class="card-text" style="flex: 1;">
+          <h3>攝影師 - HC</h3>
+          <p>擅長Cosplay攝影，拍攝方式較偏向主觀美感敘述。</p>
+          <button class="btn" onclick="openModal('modalPhotographer')">查看詳情</button>
+        </div>
+        <div class="card-image">
+          <img src="image/LINE_ALBUM_網頁用圖片_250601_8.jpg" alt="攝影師 HC" style="max-width: 200px; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+
+      <div class="card horizontal-card" style="display: flex; align-items: center; gap: 10px;">
+        <div class="card-text" style="flex: 1;">
+          <h3>攝影師 - 阿來</h3>
+          <p>擅長Cosplay攝影，作品偏向文藝風。</p>
+          <button class="btn" onclick="openModal('modalPhotographerLai')">查看詳情</button>
+        </div>
+        <div class="card-image">
+          <img src="image/LINE_ALBUM_網頁用圖片_250601_7.jpg" alt="攝影師 阿來" style="max-width: 200px; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+      </div>
+    </div>
+    
+    <div id="modalPhotographer" class="modal">
+        <div class="modal-content">
+        <span class="close" onclick="closeModal('modalPhotographer')">&times;</span>
+        <h3>攝影師 - HC</h3>
+        <p><strong>介紹：</strong>畫面柔美乾淨、注重人物神情與肢體語言的展現，敘事感豐富</p>
+        <p><strong>作品集：</strong><a href="https://www.facebook.com/share/1Em2kJhiaU/">https://www.facebook.com/share/1Em2kJhiaU/</a></p>
+        <p><strong>價目：</strong>非商業｜2500/人(2hr)、商業｜4000/人(1套服裝)</p>
+        <p><strong>預約表單：</strong><a href="https://forms.gle/N1Com9Qn9cwXRze4A">https://forms.gle/N1Com9Qn9cwXRze4A</a>
+        <br><p style="color: brown;"><strong>(可預約時段查詢：<a href="https://reurl.cc/Zn6vAM">https://reurl.cc/Zn6vAM</a>)</strong></p>
+        <p><strong>聯絡方式：</strong>
+        <br>FB｜HC Photography
+        <br>GMAIL｜<a href="hcliuliu@gmail.com">hcliuliu@gmail.com</a></p>
+        <hr />
+        <h4>留言：</h4>
+        <textarea id="commentPhotographer" rows="3" placeholder="留下評價或問題..." style="width: 100%;"></textarea>
+        <button onclick="submitModalComment('Photographer')">送出留言</button>
+        <div id="modalCommentsPhotographer" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+    <div id="modalPhotographerLai" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modalPhotographerLai')">&times;</span>
+            <h3>攝影師 - 阿來</h3>
+            <p><strong>介紹：</strong>以角色情感為拍攝核心，注重畫面節奏性與角色內心張力</p>
+            <p><strong>作品集：</strong><a href="https://reurl.cc/4L7Qz3">https://reurl.cc/4L7Qz3</a></p>
+            <p><strong>價目：</strong>非商業(1-2人)｜1800/1hr、3200/2hr</p>
+            <p><strong>預約方式：</strong>私訊IG</p>
+            <p><strong>聯絡方式：</strong>
+            <br>FB｜我是阿來
+            <br>IG｜arai95270</p>
+            <hr />
+            <h4>留言：</h4>
+            <textarea id="commentPhotographerLai" rows="3" placeholder="留下評價或問題..." style="width: 100%;"></textarea>
+            <button onclick="submitModalComment('PhotographerLai')">送出留言</button>
+            <div id="modalCommentsPhotographerLai" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+    
+   <!--Coser-->
+    <div id="coser" class="category-section" style="display: none;">
+      <div class="card horizontal-card" style="display: flex; align-items: center; gap: 10px;">
+        <div class="card-text" style="flex: 1;">
+          <h3>Coser - 漾漾</h3>
+          <p>擅長萌系、傲嬌系的可愛女性角色。</p>
+          <button class="btn" onclick="openModal('modalCoser')">查看詳情</button>
+        </div>
+        <div class="card-image">
+          <img src="image/LINE_ALBUM_網頁用圖片_250601_6.jpg" alt="Coser 漾漾" style="max-width: 200px; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+
+      <div class="card horizontal-card" style="display: flex; align-items: center; gap: 10px;">
+        <div class="card-text" style="flex: 1;">
+          <h3>Coser - 越尊</h3>
+          <p>擅長多風格男性角色。</p>
+          <button class="btn" onclick="openModal('modalCoserG')">查看詳情</button>
+        </div>
+        <div class="card-image">
+          <img src="image/LINE_ALBUM_網頁用圖片_250601_5.jpg" alt="Coser 越尊" style="max-width: 200px; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+      </div>
+    </div>
+
+
+    <div id="modalCoser" class="modal">
+        <div class="modal-content">
+        <span class="close" onclick="closeModal('modalCoser')">&times;</span>
+        <h3>Coser - 漾漾</h3>
+        <p><strong>介紹：</strong>擅長萌系、傲嬌系的可愛女性角色</p>
+        <p><strong>作品集：</strong><a href="https://www.facebook.com/share/1AjcYTPLed/">https://www.facebook.com/share/1AjcYTPLed/</a></p>
+        <p><strong>工商邀約：</strong>gmail聯繫、FB私訊</p>
+        <p><strong>聯絡方式：</strong>
+        <br>FB｜小漾樣 - Twoyun
+        <br>GMAIL｜<a href="milachang@starringent.com">milachang@starringent.com</a></p>
+        <hr />
+        <h4>留言：</h4>
+        <textarea id="commentCoser" rows="3" placeholder="留下您的評價或問題..." style="width: 100%;"></textarea>
+        <button onclick="submitModalComment('Coser')">送出留言</button>
+        <div id="modalCommentsCoser" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+    <div id="modalCoserG" class="modal">
+        <div class="modal-content">
+        <span class="close" onclick="closeModal('modalCoserG')">&times;</span>
+        <h3>Coser - 越尊</h3>
+        <p><strong>介紹：</strong>擅長多風格男性角色，特別是男主角、王子型的角色</p>
+        <p><strong>作品集：</strong><a href="https://www.facebook.com/share/1Ktbvfp5hU/">https://www.facebook.com/share/1Ktbvfp5hU/</a></p>
+        <p><strong>工商邀約：</strong>gmail聯繫</p>
+        <p><strong>聯絡方式：</strong>
+        <br>FB｜Tsun 越尊
+        <br>IG｜tsun_mikoto
+        <br>GMAIL｜<a href="cosirstudio@gmail.com">cosirstudio@gmail.com</a></p>
+        <hr />
+        <h4>留言：</h4>
+        <textarea id="commentCoserG" rows="3" placeholder="留下您的評價或問題..." style="width: 100%;"></textarea>
+        <button onclick="submitModalComment('CoserG')">送出留言</button>
+        <div id="modalCommentsCoserG" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+      
+    <!--假髮造型師-->
+    <div id="wig" class="category-section" style="display: none;">
+      <div class="card horizontal-card" style="display: flex; align-items: center; gap: 10px;">
+        <div class="card-text" style="flex: 1;">
+          <h3>假髮造型師 - 玉米</h3>
+          <p>擅長俐落男角髮型建模。</p>
+          <button class="btn" onclick="openModal('modalWig')">查看詳情</button>
+        </div>
+        <div class="card-image">
+          <img src="image/LINE_ALBUM_網頁用圖片_250601_4.jpg" alt="假髮造型師 玉米" style="max-width: 200px; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+
+      <div class="card horizontal-card" style="display: flex; align-items: center; gap: 10px;">
+        <div class="card-text" style="flex: 1;">
+          <h3>假髮造型師 - 凱蒂林</h3>
+          <p>專攻高還原動漫角色假髮</p>
+          <button class="btn" onclick="openModal('modalWigLin')">查看詳情</button>
+        </div>
+        <div class="card-image">
+          <img src="image/LINE_ALBUM_網頁用圖片_250601_3.jpg" alt="假髮造型師 凱蒂林" style="max-width: 200px; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+    </div>
+
+    <div id="modalWig" class="modal">
+        <div class="modal-content">
+        <span class="close" onclick="closeModal('modalWig')">&times;</span>
+        <h3>假髮造型師 - 玉米</h3>
+        <p><strong>介紹：</strong>擅長俐落男角髮型建模，層次清晰、走線俐落，呈現出強烈角色性格與氣場</p>
+        <p><strong>作品集：</strong><a href="https://www.facebook.com/share/15yTK8YXNq/">https://www.facebook.com/share/15yTK8YXNq/</a></p>
+        <p><strong>價目：</strong>帶圖私訊估價，基本造型｜500起、髮際線+髮流重塑｜1000起</p>
+        <p><strong>預約方式：</strong>FB私訊</p>
+        <p><strong>聯絡方式：</strong>
+        <br>FB｜雨丸
+        <br>IG｜amemaru_cos</p>
+        <hr />
+        <h4>留言：</h4>
+        <textarea id="commentWig" rows="3" placeholder="留下您的評價或問題..." style="width: 100%;"></textarea>
+        <button onclick="submitModalComment('Wig')">送出留言</button>
+        <div id="modalCommentsWig" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+    <div id="modalWigLin" class="modal">
+        <div class="modal-content">
+        <span class="close" onclick="closeModal('modalWigLin')">&times;</span>
+        <h3>假髮造型師 - 凱蒂林</h3>
+        <p><strong>介紹：</strong>專精鋒利輪廓與剪裁技巧、建模型反重力風格造型</p>
+        <p><strong>作品集：</strong><a href="https://www.instagram.com/catty_0117?igsh=bTVyYXc0ODl0OXRq">https://www.instagram.com/catty_0117?igsh=bTVyYXc0ODl0OXRq</a></p>
+        <p><strong>價目：</strong>帶圖私訊估價，基本造型｜1000起、高階反重力造型｜2000起</p>
+        <p><strong>預約方式：</strong>FB私訊</p>
+        <p><strong>聯絡方式：</strong>
+        <br>FB｜Catty Lin
+        <br>IG｜catty_0117</p>
+        <hr />
+        <h4>留言：</h4>
+        <textarea id="commentWigLin" rows="3" placeholder="留下您的評價或問題..." style="width: 100%;"></textarea>
+        <button onclick="submitModalComment('WigLin')">送出留言</button>
+        <div id="modalCommentsWigLin" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+
+    <!--化妝師-->
+    <div id="makeup" class="category-section" style="display: none;">
+      <div class="card horizontal-card" style="display: flex; align-items: center; gap: 10px;">
+        <div class="card-text" style="flex: 1;">
+          <h3>化妝師 - 希瓦德</h3>
+          <p>Cosplay專業妝容，作品富有角色情緒與敘事力。</p>
+          <button class="btn" onclick="openModal('modalMakeup')">查看詳情</button>
+        </div>
+        <div class="card-image">
+          <img src="image/LINE_ALBUM_網頁用圖片_250601_2.jpg" alt="化妝師 希瓦德" style="max-width: 200px; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+    </div>
+
+    <div id="modalMakeup" class="modal">
+        <div class="modal-content">
+        <span class="close" onclick="closeModal('modalMakeup')">&times;</span>
+        <h3>化妝師 - 希瓦德</h3>
+        <p><strong>介紹：</strong>擅於結合角色個性與化妝風格，妝效故事性強</p>
+        <p><strong>作品集：</strong><a href="https://www.instagram.com/seward_makeup?igsh=MWt5emtkOTg3NmxqZA==">https://www.instagram.com/seward_makeup?igsh=MWt5emtkOTg3NmxqZA==</a></p>
+        <p><strong>價目：</strong>淡妝｜1200起、角色妝｜1400、淡歐美濃妝｜1500</p>
+        <p><strong>預約方式：</strong>FB私訊</p>
+        <p><strong>聯絡方式：</strong>
+        <br>FB｜希瓦德Seward《Cosplay／彩妝造型／新秘》
+        <br>IG｜seward_makeup</p>
+        <hr />
+        <h4>留言：</h4>
+        <textarea id="commentMakeup" rows="3" placeholder="留下您的評價或問題..." style="width: 100%;"></textarea>
+        <button onclick="submitModalComment('Makeup')">送出留言</button>
+        <div id="modalCommentsMakeup" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+    
+    <!--夢女委託-->
+    <div id="dream" class="category-section" style="display: none;">
+      <div class="card horizontal-card" style="display: flex; align-items: center; gap: 10px;">
+        <div class="card-text" style="flex: 1;">
+          <h3>夢女委託 - 頹頹</h3>
+          <p>擅長王子系、療癒系與暖男風格的少年角色。</p>
+          <button class="btn" onclick="openModal('modalDream')">查看詳情</button>
+        </div>
+        <div class="card-image">
+          <img src="image/LINE_ALBUM_網頁用圖片_250601_1.jpg" alt="夢女委託  頹頹" style="max-width: 200px; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+    </div>
+
+    <div id="modalDream" class="modal">
+        <div class="modal-content">
+        <span class="close" onclick="closeModal('modalDream')">&times;</span>
+        <h3>夢女委託 - 頹頹</h3>
+        <p><strong>介紹：</strong>擅長王子系、療癒系與暖男風格的少年角色</p>
+        <p><strong>作品集：</strong><a href="https://www.instagram.com/tueituei0614/">https://www.instagram.com/tueituei0614/</a></p>
+        <p><strong>價目：</strong>1000/hr</p>
+        <p><strong>預約方式：</strong>私訊IG</p>
+        <p><strong>聯絡方式：</strong>
+        <br>FB｜頹超大
+        <br>IG｜tueituei0614</p>
+        <hr />
+        <h4>留言：</h4>
+        <textarea id="commentDream" rows="3" placeholder="留下您的評價或問題..." style="width: 100%;"></textarea>
+        <button onclick="submitModalComment('Dream')">送出留言</button>
+        <div id="modalCommentsDream" style="margin-top: 1rem;"></div>
+        </div>
+    </div> 
+    </section>
+
+
+     <!-- 交流區 -->
+    <section id="community">
+      <h2>交流區（社群貼文系統）</h2>
+      <div class="card">
+        <input type="text" id="postTitle" placeholder="貼文標題" />
+        <input type="text" id="postTags" placeholder="主題標籤（如：#心得、#展示）"/>
+        <textarea id="postContent" rows="3" placeholder="貼文內容"></textarea><br>
+        <button onclick="createPost()">發表</button>
+      </div>
+      <div id="postList"></div>
+      <div style="text-align: center; margin-top: 2rem;">
+      <button onclick="clearData()" style="background-color: #ff4f72; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer;">
+        清除所有紀錄（貼文與留言）
+      </button>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 次元街角 DimCorner — All rights reserved.
+  </footer>
+
+<script>
+  // 頁籤切換邏輯
+  document.querySelectorAll("nav button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll("main section").forEach(s => s.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.target).classList.add("active");
+    });
+  });
+
+  // 活動城市切換
+
+  const regionCityMap = {
+    north: [
+      { name: "台北", id: "taipei" },
+      { name: "新北", id: "newtaipei" },
+      { name: "新竹", id: "hsinchu" }
+    ],
+    central: [
+      { name: "台中", id: "taichung" },
+      { name: "彰化", id: "changhua" },
+    ],
+    south: [
+      { name: "高雄", id: "kaohsiung" },
+      { name: "台南", id: "tainan" },
+      { name: "屏東", id: "pingtung" }
+    ]
+  };
+
+
+  function handleRegionChange() {
+    const region = document.getElementById("regionSelector").value;
+    const cityButtonsDiv = document.getElementById("cityButtons");
+    cityButtonsDiv.innerHTML = "";
+
+    // 清除所有城市內容
+    document.querySelectorAll('.event-city').forEach(div => div.style.display = "none");
+
+    if (regionCityMap[region]) {
+      regionCityMap[region].forEach(city => {
+        const btn = document.createElement("button");
+        btn.textContent = city.name;
+        btn.onclick = () => switchCity(city.id);
+        btn.className = "city-btn";
+        cityButtonsDiv.appendChild(btn);
+      });
+    }
+  }
+
+  function switchCity(cityId) {
+    document.querySelectorAll('.event-city').forEach(div => {
+      div.style.display = div.id === cityId ? "block" : "none";
+    });
+  }
+
+
+  // 委託分類切換
+  function switchCategory(categoryId) {
+    document.querySelectorAll(".category-section").forEach(e => e.style.display = "none");
+    document.querySelectorAll(".city-switcher button").forEach(b => b.classList.remove("active"));
+    document.getElementById(categoryId).style.display = "block";
+    event.target.classList.add("active");
+  }
+
+  // Modal 開啟與關閉
+  function openModal(id) {
+    document.getElementById(id).style.display = "flex";
+  }
+  function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+  }
+
+  // Modal 留言儲存
+  function submitModalComment(type) {
+    const textarea = document.getElementById(`comment${type}`);
+    const comment = textarea.value.trim();
+    if (!comment) return;
+    const list = document.getElementById(`modalComments${type}`);
+    const p = document.createElement("p");
+    p.textContent = comment;
+    list.appendChild(p);
+    textarea.value = "";
+    saveData(); // 自動存進 localStorage
+  }
+
+  // ---------- 社群貼文區 ----------
+  const postList = document.getElementById("postList");
+
+  function createPost() {
+    const title = document.getElementById("postTitle").value.trim();
+    const tags = document.getElementById("postTags").value.trim();
+    const content = document.getElementById("postContent").value.trim();
+
+    if (!title || !content) return alert("標題與內容為必填欄位");
+
+    const post = {
+      id: Date.now(),
+      title, tags, content,
+      likes: 0,
+      comments: [],
+      liked: false,
+      saved: false
+    };
+
+    posts.unshift(post);
+    renderPosts();
+    saveData();
+
+    // 清空輸入欄
+    document.getElementById("postTitle").value = "";
+    document.getElementById("postTags").value = "";
+    document.getElementById("postContent").value = "";
+  }
+
+  function renderPosts() {
+    postList.innerHTML = "";
+    posts.forEach(post => {
+      const card = document.createElement("div");
+      card.className = "post";
+      card.innerHTML = `
+        <h3>${post.title}</h3>
+        <p style="color:#999">${post.tags}</p>
+        <p>${post.content}</p>
+        <div class="like-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+          👍 ${post.likes} ${post.liked ? '(已按讚)' : ''}
+        </div>
+        <div class="like-btn" onclick="toggleSave(${post.id})">
+          📌 ${post.saved ? '已收藏' : '收藏'}
+        </div>
+        <div class="comment-input">
+          <input type="text" placeholder="留言..." onkeydown="handleCommentKey(event, ${post.id})"/>
+          <button onclick="addComment(${post.id}, this.previousElementSibling.value)">送出</button>
+        </div>
+        <div>
+          ${post.comments.map((c, i) => `
+            <p style="margin-left:1rem;">
+                💬 ${c}
+                <span onclick="deleteComment(${post.id}, ${i})" style="color:red; cursor:pointer; margin-left:10px;">🗑️</span>
+            </p>
+            `).join("")}
+
+        </div>
+      `;
+      postList.appendChild(card);
+    });
+  }
+
+  function toggleLike(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post || post.liked) return;
+    post.liked = true;
+    post.likes++;
+    renderPosts();
+    saveData();
+  }
+
+  function toggleSave(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+    post.saved = !post.saved;
+    renderPosts();
+    saveData();
+  }
+
+  function addComment(id, text) {
+    const post = posts.find(p => p.id === id);
+    if (!post || !text.trim()) return;
+    post.comments.push(text.trim());
+    renderPosts();
+    saveData();
+  }
+  function deleteComment(postId, commentIndex) {
+  if (!confirm("確定要刪除這則留言嗎？")) return;
+  const post = posts.find(p => p.id === postId);
+  if (!post) return;
+  post.comments.splice(commentIndex, 1);
+  renderPosts();
+  saveData();
+}
+
+
+  function handleCommentKey(e, id) {
+    if (e.key === "Enter") {
+      addComment(id, e.target.value);
+    }
+  }
+
+  // 本地儲存（localStorage）
+  let posts = JSON.parse(localStorage.getItem("communityPosts") || "[]");
+
+  function saveData() {
+    localStorage.setItem("communityPosts", JSON.stringify(posts));
+  }
+
+  function clearData() {
+    if (confirm("確定要清除所有貼文與留言嗎？此動作無法復原。")) {
+      posts = [];
+      saveData();
+      renderPosts();
+      document.querySelectorAll('[id^="modalComments"]').forEach(el => el.innerHTML = '');
+    }
+  }
+
+  renderPosts();
+</script>
+
+
+</body>
+</html>
